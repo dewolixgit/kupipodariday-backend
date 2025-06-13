@@ -5,6 +5,11 @@ import { UsersModule } from './users/users.module';
 import { WishesModule } from './wishes/wishes.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { OffersController } from './offers/offers.controller';
+import { WishlistsModule } from './wishlists/wishlists.module';
+import { OffersModule } from './offers/offers.module';
+import { ENV_KEYS } from './common/constants';
+import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [
@@ -13,11 +18,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: Number(configService.get('DB_PORT')),
-        username: configService.get('DB_USER'),
-        password: configService.get('DB_PASS'),
-        database: configService.get('DB_NAME'),
+        host: configService.get(ENV_KEYS.dbHost) ?? 'localhost',
+        port: Number(configService.get(ENV_KEYS.dbPort) ?? 5432),
+        username: configService.get(ENV_KEYS.dbUser) ?? 'postgres',
+        password: configService.get(ENV_KEYS.dbPass) ?? 'my-password',
+        database: configService.get(ENV_KEYS.dbName) ?? 'kupipodariday',
         synchronize: true,
         autoLoadEntities: true,
       }),
@@ -26,8 +31,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     UsersModule,
     WishesModule,
     AuthModule,
+    WishlistsModule,
+    OffersModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, OffersController, AuthController],
   providers: [],
 })
 export class AppModule {}
