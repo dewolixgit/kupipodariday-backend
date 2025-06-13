@@ -1,6 +1,7 @@
 export const ERROR_MESSAGES = {
   userAlreadyExists:
     'Пользователь с таким email или username уже зарегистрирован',
+  invalidCredentials: 'Неверные имя пользователя или пароль',
 };
 
 export const DEFAULTS = {

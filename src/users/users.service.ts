@@ -15,6 +15,13 @@ export class UsersService {
     private configService: ConfigService,
   ) {}
 
+  async findByUsername(username: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { username },
+      select: ['id', 'username', 'password'],
+    });
+  }
+
   async create(dto: CreateUserDto): Promise<Omit<User, 'password'>> {
     const { email, username, password, about, avatar } = dto;
 
