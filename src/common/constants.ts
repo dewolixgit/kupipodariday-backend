@@ -6,6 +6,7 @@ export const ERROR_MESSAGES = {
   wishEditForbidden: 'Можно редактировать только свои подарки',
   priceChangeForbidden:
     'Стоимость изменить нельзя: уже есть желающие скинуться',
+  wishlistNotFound: 'Подборка не найдена',
 };
 
 export const DEFAULTS = {
