@@ -2,6 +2,10 @@ export const ERROR_MESSAGES = {
   userAlreadyExists:
     'Пользователь с таким email или username уже зарегистрирован',
   invalidCredentials: 'Неверные имя пользователя или пароль',
+  wishNotFound: 'Подарок не найден',
+  wishEditForbidden: 'Можно редактировать только свои подарки',
+  priceChangeForbidden:
+    'Стоимость изменить нельзя: уже есть желающие скинуться',
 };
 
 export const DEFAULTS = {
