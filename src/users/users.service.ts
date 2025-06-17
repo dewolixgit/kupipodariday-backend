@@ -1,4 +1,8 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -6,6 +10,9 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { ENV_KEYS, ERROR_MESSAGES } from '../common/constants';
 import { ConfigService } from '@nestjs/config';
+import { UpdateUserDto } from './dto/update-user.dto';
+
+const BCRYPT_SALT_ROUNDS_DEFAULT = 10;
 
 @Injectable()
 export class UsersService {
@@ -35,7 +42,10 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(
       password,
-      Number(this.configService.get(ENV_KEYS.bcryptSaltRounds) ?? 10),
+      Number(
+        this.configService.get(ENV_KEYS.bcryptSaltRounds) ??
+          BCRYPT_SALT_ROUNDS_DEFAULT,
+      ),
     );
 
     const user = this.usersRepository.create({
@@ -49,5 +59,34 @@ export class UsersService {
     const saved = await this.usersRepository.save(user);
     const { password: _, ...returnUserFields } = saved;
     return returnUserFields;
+  }
+
+  async update(userId: number, dto: UpdateUserDto) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException();
+
+    if (dto.email || dto.username) {
+      const clash = await this.usersRepository.findOne({
+        where: [{ email: dto.email }, { username: dto.username }],
+      });
+
+      if (clash && clash.id !== userId) {
+        throw new ConflictException(ERROR_MESSAGES.userAlreadyExists);
+      }
+    }
+
+    if (dto.password) {
+      const saltRounds =
+        this.configService.get<number>(ENV_KEYS.bcryptSaltRounds) ??
+        BCRYPT_SALT_ROUNDS_DEFAULT;
+      dto.password = await bcrypt.hash(dto.password, saltRounds);
+    }
+
+    Object.assign(user, dto);
+    const updated = await this.usersRepository.save(user);
+
+    delete updated.password;
+    delete updated.email;
+    return updated;
   }
 }

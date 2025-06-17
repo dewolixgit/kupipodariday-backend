@@ -7,6 +7,7 @@ export const ERROR_MESSAGES = {
   priceChangeForbidden:
     'Стоимость изменить нельзя: уже есть желающие скинуться',
   wishlistNotFound: 'Подборка не найдена',
+  profileEditForbidden: 'Нельзя редактировать чужой профиль',
 };
 
 export const DEFAULTS = {
