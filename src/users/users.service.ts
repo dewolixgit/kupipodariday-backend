@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
@@ -119,5 +119,14 @@ export class UsersService {
           user: o.user,
         })),
     }));
+  }
+
+  async findMany(search: string) {
+    return this.usersRepository.find({
+      where: [
+        { username: ILike(`%${search}%`) },
+        { email: ILike(`%${search}%`) },
+      ],
+    });
   }
 }

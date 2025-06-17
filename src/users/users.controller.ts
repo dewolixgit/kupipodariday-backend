@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Get,
   Param,
+  Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -15,6 +16,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserPublicProfileDto } from './dto/user-public-profile.dto';
 import { plainToInstance } from 'class-transformer';
 import { UserWishDto } from '../wishes/dto/user-wish.dto';
+import { FindUsersDto } from './dto/find-users.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -39,6 +41,15 @@ export class UsersController {
   async getWishes(@Param('username') username: string, @CurrentUser() viewer) {
     const wishes = await this.usersService.findUserWishes(username, viewer.id);
     return plainToInstance(UserWishDto, wishes, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  @Post('find')
+  @HttpCode(HttpStatus.CREATED)
+  async findMany(@Body() dto: FindUsersDto) {
+    const users = await this.usersService.findMany(dto.query);
+    return plainToInstance(UserPublicProfileDto, users, {
       excludeExtraneousValues: true,
     });
   }
