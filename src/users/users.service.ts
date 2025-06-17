@@ -1,6 +1,6 @@
 import {
-  Injectable,
   ConflictException,
+  Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -88,5 +88,36 @@ export class UsersService {
     delete updated.password;
     delete updated.email;
     return updated;
+  }
+
+  async findPublicProfile(username: string) {
+    const user = await this.usersRepository.findOne({ where: { username } });
+    if (!user) throw new NotFoundException();
+
+    return user;
+  }
+
+  async findUserWishes(username: string, viewerId: number) {
+    const user = await this.usersRepository.findOne({
+      where: { username },
+      relations: ['wishes', 'wishes.offers', 'wishes.offers.user'],
+    });
+
+    if (!user) throw new NotFoundException();
+
+    const isOwner = user.id === viewerId;
+
+    return user.wishes.map((w) => ({
+      ...w,
+      offers: w.offers
+        .filter((o) => isOwner || !o.hidden)
+        .map((o) => ({
+          id: o.id,
+          amount: !isOwner && o.hidden ? undefined : o.amount,
+          hidden: o.hidden,
+          createdAt: o.createdAt,
+          user: o.user,
+        })),
+    }));
   }
 }
