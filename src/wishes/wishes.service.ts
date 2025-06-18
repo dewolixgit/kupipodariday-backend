@@ -9,7 +9,7 @@ import { DataSource, Repository } from 'typeorm';
 import { Wish } from './entities/wish.entity';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
-import { ERROR_MESSAGES } from '../common/constants';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../common/constants';
 
 @Injectable()
 export class WishesService {
@@ -115,5 +115,25 @@ export class WishesService {
       });
       return manager.save(clone);
     });
+  }
+
+  async removeOne(id: number, currentUserId: number) {
+    const wish = await this.wishesRepo.findOne({
+      where: { id },
+      relations: ['owner', 'offers'],
+    });
+
+    if (!wish) throw new NotFoundException();
+
+    if (wish.owner.id !== currentUserId) {
+      throw new ForbiddenException(ERROR_MESSAGES.wishDeleteForbidden);
+    }
+
+    if (wish.offers.length > 0) {
+      throw new BadRequestException(ERROR_MESSAGES.wishHasOffers);
+    }
+
+    await this.wishesRepo.delete(id);
+    return { message: SUCCESS_MESSAGES.wishDeleted };
   }
 }

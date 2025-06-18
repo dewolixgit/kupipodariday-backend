@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -75,5 +76,12 @@ export class WishesController {
     return plainToInstance(WishDetailDto, newWish, {
       excludeExtraneousValues: true,
     });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user) {
+    return this.wishesService.removeOne(id, user.id);
   }
 }

@@ -12,6 +12,12 @@ export const ERROR_MESSAGES = {
   wishIsFullyFunded: 'На подарок уже собрана вся сумма',
   amountTooBig: 'Сумма превышает остаток до полной стоимости',
   copyOwnForbidden: 'Нельзя копировать свой собственный подарок',
+  wishDeleteForbidden: 'Нельзя удалить чужой подарок',
+  wishHasOffers: 'Нельзя удалить подарок: уже есть желающие скинуться',
+};
+
+export const SUCCESS_MESSAGES = {
+  wishDeleted: 'Подарок удалён',
 };
 
 export const DEFAULTS = {
