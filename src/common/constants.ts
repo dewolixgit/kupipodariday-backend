@@ -8,6 +8,9 @@ export const ERROR_MESSAGES = {
     'Стоимость изменить нельзя: уже есть желающие скинуться',
   wishlistNotFound: 'Подборка не найдена',
   profileEditForbidden: 'Нельзя редактировать чужой профиль',
+  ownOfferForbidden: 'Нельзя вносить деньги на собственный подарок',
+  wishIsFullyFunded: 'На подарок уже собрана вся сумма',
+  amountTooBig: 'Сумма превышает остаток до полной стоимости',
 };
 
 export const DEFAULTS = {
