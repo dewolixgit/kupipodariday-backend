@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Wish } from './entities/wish.entity';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
@@ -16,6 +16,7 @@ export class WishesService {
   constructor(
     @InjectRepository(Wish)
     private wishesRepo: Repository<Wish>,
+    private dataSource: DataSource,
   ) {}
 
   async findLast(): Promise<Wish[]> {
@@ -83,5 +84,36 @@ export class WishesService {
     }
 
     return wish;
+  }
+
+  async copyWish(sourceId: number, userId: number) {
+    const source = await this.wishesRepo.findOne({
+      where: { id: sourceId },
+      relations: ['owner'],
+    });
+
+    if (!source) {
+      throw new NotFoundException(ERROR_MESSAGES.wishNotFound);
+    }
+
+    if (source.owner.id === userId) {
+      throw new ForbiddenException(ERROR_MESSAGES.copyOwnForbidden);
+    }
+
+    return this.dataSource.transaction(async (manager) => {
+      await manager.increment(Wish, { id: sourceId }, 'copied', 1);
+
+      const clone = manager.create(Wish, {
+        name: source.name,
+        link: source.link,
+        image: source.image,
+        price: source.price,
+        description: source.description,
+        owner: { id: userId } as any,
+        raised: 0,
+        copied: 0,
+      });
+      return manager.save(clone);
+    });
   }
 }

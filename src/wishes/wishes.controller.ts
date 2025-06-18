@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -61,6 +63,16 @@ export class WishesController {
   ): Promise<WishDetailDto> {
     const wish = await this.wishesService.findOneWithOffers(id, user.id);
     return plainToInstance(WishDetailDto, wish, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/copy')
+  @HttpCode(HttpStatus.CREATED)
+  async copyWish(@Param('id', ParseIntPipe) id: number, @CurrentUser() user) {
+    const newWish = await this.wishesService.copyWish(id, user.id);
+    return plainToInstance(WishDetailDto, newWish, {
       excludeExtraneousValues: true,
     });
   }

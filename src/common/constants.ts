@@ -11,6 +11,7 @@ export const ERROR_MESSAGES = {
   ownOfferForbidden: 'Нельзя вносить деньги на собственный подарок',
   wishIsFullyFunded: 'На подарок уже собрана вся сумма',
   amountTooBig: 'Сумма превышает остаток до полной стоимости',
+  copyOwnForbidden: 'Нельзя копировать свой собственный подарок',
 };
 
 export const DEFAULTS = {
