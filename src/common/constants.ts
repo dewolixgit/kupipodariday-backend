@@ -14,10 +14,14 @@ export const ERROR_MESSAGES = {
   copyOwnForbidden: 'Нельзя копировать свой собственный подарок',
   wishDeleteForbidden: 'Нельзя удалить чужой подарок',
   wishHasOffers: 'Нельзя удалить подарок: уже есть желающие скинуться',
+  wishlistEditForbidden: 'Нельзя изменять чужую подборку',
+  wishlistDeleteForbidden: 'Нельзя удалять чужую подборку',
+  wishIdsEmpty: 'Нужно передать хотя бы один itemId',
 };
 
 export const SUCCESS_MESSAGES = {
   wishDeleted: 'Подарок удалён',
+  wishlistDeleted: 'Подборка удалена',
 };
 
 export const DEFAULTS = {
