@@ -5,11 +5,9 @@ import { UsersModule } from './users/users.module';
 import { WishesModule } from './wishes/wishes.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { OffersController } from './offers/offers.controller';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { OffersModule } from './offers/offers.module';
 import { ENV_KEYS } from './common/constants';
-import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [
@@ -34,7 +32,7 @@ import { AuthController } from './auth/auth.controller';
     WishlistsModule,
     OffersModule,
   ],
-  controllers: [AppController, OffersController, AuthController],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}
