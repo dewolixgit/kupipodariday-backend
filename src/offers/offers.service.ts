@@ -63,10 +63,16 @@ export class OffersService {
     return this.offersRepo.find({ relations: ['item', 'user'] });
   }
 
-  findOne(id: number) {
-    return this.offersRepo.findOne({
+  async findOne(id: number) {
+    const offer = await this.offersRepo.findOne({
       where: { id },
       relations: ['item', 'user'],
     });
+
+    if (!offer) {
+      throw new NotFoundException(ERROR_MESSAGES.offerNotFound);
+    }
+
+    return offer;
   }
 }

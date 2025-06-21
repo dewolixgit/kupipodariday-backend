@@ -31,8 +31,11 @@ export class OffersController {
   }
 
   @Get()
-  findAll() {
-    return this.offersService.findAll();
+  async findAll() {
+    const offers = await this.offersService.findAll();
+    return plainToInstance(OfferPublicDto, offers, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get(':id')

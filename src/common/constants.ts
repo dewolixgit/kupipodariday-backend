@@ -17,6 +17,7 @@ export const ERROR_MESSAGES = {
   wishlistEditForbidden: 'Нельзя изменять чужую подборку',
   wishlistDeleteForbidden: 'Нельзя удалять чужую подборку',
   wishIdsEmpty: 'Нужно передать хотя бы один itemId',
+  offerNotFound: 'Предложение не найдено',
 };
 
 export const SUCCESS_MESSAGES = {
