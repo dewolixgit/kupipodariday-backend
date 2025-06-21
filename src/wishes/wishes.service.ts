@@ -40,7 +40,7 @@ export class WishesService {
       ...dto,
       raised: 0,
       copied: 0,
-      owner: { id: ownerId } as any,
+      owner: { id: ownerId },
     });
     return this.wishesRepo.save(wish);
   }
@@ -109,7 +109,7 @@ export class WishesService {
         image: source.image,
         price: source.price,
         description: source.description,
-        owner: { id: userId } as any,
+        owner: { id: userId },
         raised: 0,
         copied: 0,
       });
