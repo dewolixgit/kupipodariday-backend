@@ -22,6 +22,23 @@ export class UsersService {
     private configService: ConfigService,
   ) {}
 
+  async findOwn(id: number) {
+    return this.usersRepository.findOne({ where: { id } });
+  }
+
+  async getOwnWishes(userId: number) {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: [
+        'wishes',
+        'wishes.offers',
+        'wishes.offers.user',
+        'wishes.owner',
+      ],
+    });
+    return user.wishes;
+  }
+
   async findByUsername(username: string): Promise<User | null> {
     return this.usersRepository.findOne({
       where: { username },
@@ -76,9 +93,10 @@ export class UsersService {
     }
 
     if (dto.password) {
-      const saltRounds =
-        this.configService.get<number>(ENV_KEYS.bcryptSaltRounds) ??
-        BCRYPT_SALT_ROUNDS_DEFAULT;
+      const saltRounds = Number(
+        this.configService.get(ENV_KEYS.bcryptSaltRounds) ??
+          BCRYPT_SALT_ROUNDS_DEFAULT,
+      );
       dto.password = await bcrypt.hash(dto.password, saltRounds);
     }
 

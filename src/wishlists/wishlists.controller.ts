@@ -18,7 +18,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 
 @UseGuards(JwtAuthGuard)
-@Controller('wishlists')
+@Controller('wishlistlists')
 export class WishlistsController {
   constructor(private readonly listsService: WishlistsService) {}
 
