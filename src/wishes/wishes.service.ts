@@ -96,10 +96,6 @@ export class WishesService {
       throw new NotFoundException(ERROR_MESSAGES.wishNotFound);
     }
 
-    if (source.owner.id === userId) {
-      throw new ForbiddenException(ERROR_MESSAGES.copyOwnForbidden);
-    }
-
     return this.dataSource.transaction(async (manager) => {
       await manager.increment(Wish, { id: sourceId }, 'copied', 1);
 
