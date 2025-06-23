@@ -32,6 +32,10 @@ export const DEFAULTS = {
   },
 };
 
+export const POSTGRES_ERROR_CODE = {
+  uniqueViolation: '23505',
+};
+
 export const ENV_KEYS = {
   dbHost: 'DB_HOST',
   dbPort: 'DB_PORT',
