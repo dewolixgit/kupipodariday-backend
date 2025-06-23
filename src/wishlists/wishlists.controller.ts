@@ -16,6 +16,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { plainToInstance } from 'class-transformer';
+import { WishlistDetailDto } from './dto/wishlist-detail.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('wishlistlists')
@@ -23,13 +25,21 @@ export class WishlistsController {
   constructor(private readonly listsService: WishlistsService) {}
 
   @Get()
-  findAll() {
-    return this.listsService.findAll();
+  async findAll() {
+    const lists = await this.listsService.findAll();
+
+    return plainToInstance(WishlistDetailDto, lists, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.listsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const list = await this.listsService.findOne(id);
+
+    return plainToInstance(WishlistDetailDto, list, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Post()
@@ -44,7 +54,11 @@ export class WishlistsController {
     @Body() dto: UpdateWishlistDto,
     @CurrentUser() user,
   ) {
-    return this.listsService.update(id, dto, user.id);
+    const list = this.listsService.update(id, dto, user.id);
+
+    return plainToInstance(WishlistDetailDto, list, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Delete(':id')

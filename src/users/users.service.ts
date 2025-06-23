@@ -8,7 +8,11 @@ import { ILike, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
-import { ENV_KEYS, ERROR_MESSAGES } from '../common/constants';
+import {
+  ENV_KEYS,
+  ERROR_MESSAGES,
+  POSTGRES_ERROR_CODE,
+} from '../common/constants';
 import { ConfigService } from '@nestjs/config';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -49,14 +53,6 @@ export class UsersService {
   async create(dto: CreateUserDto): Promise<Omit<User, 'password'>> {
     const { email, username, password, about, avatar } = dto;
 
-    const existing = await this.usersRepository.findOne({
-      where: [{ email }, { username }],
-    });
-
-    if (existing) {
-      throw new ConflictException(ERROR_MESSAGES.userAlreadyExists);
-    }
-
     const hashedPassword = await bcrypt.hash(
       password,
       Number(
@@ -73,24 +69,26 @@ export class UsersService {
       avatar,
     });
 
-    const saved = await this.usersRepository.save(user);
-    const { password: _, ...returnUserFields } = saved;
-    return returnUserFields;
+    let saved: User;
+
+    try {
+      saved = await this.usersRepository.save(user);
+    } catch (e: any) {
+      if (e.code === POSTGRES_ERROR_CODE.uniqueViolation) {
+        throw new ConflictException(ERROR_MESSAGES.userAlreadyExists);
+      }
+
+      throw e;
+    }
+
+    const { password: _, ...result } = saved;
+
+    return result;
   }
 
   async update(userId: number, dto: UpdateUserDto) {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     if (!user) throw new NotFoundException();
-
-    if (dto.email || dto.username) {
-      const clash = await this.usersRepository.findOne({
-        where: [{ email: dto.email }, { username: dto.username }],
-      });
-
-      if (clash && clash.id !== userId) {
-        throw new ConflictException(ERROR_MESSAGES.userAlreadyExists);
-      }
-    }
 
     if (dto.password) {
       const saltRounds = Number(
@@ -101,7 +99,17 @@ export class UsersService {
     }
 
     Object.assign(user, dto);
-    const updated = await this.usersRepository.save(user);
+
+    let updated: User;
+
+    try {
+      updated = await this.usersRepository.save(user);
+    } catch (e: any) {
+      if (e.code === POSTGRES_ERROR_CODE.uniqueViolation) {
+        throw new ConflictException(ERROR_MESSAGES.userAlreadyExists);
+      }
+      throw e;
+    }
 
     delete updated.password;
     delete updated.email;
